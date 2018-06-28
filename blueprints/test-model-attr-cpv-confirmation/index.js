@@ -1,0 +1,55 @@
+/* eslint-env node */
+const EOL = require('os').EOL;
+const SilentError = require('silent-error');
+
+module.exports = {
+  description: 'Generates a test for model\'s attribute to check if its value matches another attr value',
+
+  model: undefined,
+  attr: undefined,
+  on: undefined,
+
+  availableOptions: [
+    {name: 'on', type: String},
+  ],
+
+  locals(options) {
+    const chunks = options.entity.name.split(':');
+    this.model = chunks[0];
+    this.attr = chunks.slice(1).join(':');
+    this.on = options.on;
+    return {};
+  },
+
+  beforeInstall() {
+    if (!('ember-cp-validations' in this.project.dependencies())) {
+      return Promise.reject(new SilentError('please, install `ember-cp-validations` before using this generator'));
+    }
+    if (typeof this.on === 'undefined') {
+      return Promise.reject(new SilentError('--on is required'));
+    }
+  },
+
+  afterInstall() {
+    return this.insertTest();
+  },
+
+  insertTest() {
+    return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
+      `${EOL}  test('#${this.attr} must match #${this.on} value', function (assert) {`,
+      `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+      `    const firstValue = 'Jim';`,
+      `    const secondValue = 'Sarah';`,
+      `    run(() => {`,
+      `      set(model, '${this.attr}', firstValue);`,
+      `      set(model, '${this.on}', secondValue);`,
+      `    });`,
+      `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+      ``,
+      `    run(() => set(model, '${this.attr}', secondValue));`,
+      `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+      `  });`
+    ].join(`${EOL}`), {after: '});'});
+  },
+
+};
