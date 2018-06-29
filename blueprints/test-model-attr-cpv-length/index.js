@@ -7,12 +7,14 @@ module.exports = {
 
   model: undefined,
   attr: undefined,
-  length: undefined,
-  defaultValue: undefined,
+  max: undefined,
+  min: undefined,
+  is: undefined,
 
   availableOptions: [
     {name: 'max', type: Number},
-    {name: 'min', type: Number}
+    {name: 'min', type: Number},
+    {name: 'is', type: Number}
   ],
 
   locals(options) {
@@ -21,6 +23,7 @@ module.exports = {
     this.attr = chunks.slice(1).join(':');
     this.min = options.min;
     this.max = options.max;
+    this.is = options.is;
     return {};
   },
 
@@ -28,8 +31,8 @@ module.exports = {
     if (!('ember-cp-validations' in this.project.dependencies())) {
       return Promise.reject(new SilentError('please, install `ember-cp-validations` before using this generator'));
     }
-    if (typeof this.max === 'undefined' && typeof this.min === 'undefined') {
-      return Promise.reject(new SilentError('--max or --min is required'));
+    if (typeof this.max === 'undefined' && typeof this.min === 'undefined' && typeof this.is === 'undefined') {
+      return Promise.reject(new SilentError('--is, --max or --min is required'));
     }
     if (typeof this.max === 'number' && typeof this.min === 'number' && this.max < this.min) {
       return Promise.reject(new SilentError('--max must be greater than --min'));
@@ -42,7 +45,8 @@ module.exports = {
 
   insertTest() {
     return this.insertMinTest()
-      .then(() => this.insertMaxTest());
+      .then(() => this.insertMaxTest())
+      .then(() => this.insertIsTest());
   },
 
   insertMaxTest() {
@@ -73,6 +77,26 @@ module.exports = {
         `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
         `    run(() => set(model, '${this.attr}', new Array(${this.min + 2}).join('*')));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        ``,
+        `    run(() => set(model, '${this.attr}', new Array(${this.min}).join('*')));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        ``,
+        `    run(() => set(model, '${this.attr}', new Array(${this.min - 1}).join('*')));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `  });`
+      ].join(`${EOL}`), {after: '});'});
+    }
+    return Promise.resolve();
+  },
+
+  insertIsTest() {
+    if (typeof this.min !== 'undefined') {
+      const msg = `#${this.attr} length is ${this.min}`;
+      return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
+        `${EOL}  test('${msg}', function (assert) {`,
+        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    run(() => set(model, '${this.attr}', new Array(${this.min + 2}).join('*')));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
         ``,
         `    run(() => set(model, '${this.attr}', new Array(${this.min}).join('*')));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
