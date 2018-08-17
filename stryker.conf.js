@@ -7,7 +7,6 @@ module.exports = function (config) {
     coverageAnalysis: 'all',
     mutate: ['blueprints/**/index.js'],
     mutator: 'javascript',
-    logLevel: 'trace',
     thresholds: {
       high: 90,
       low: 70,
