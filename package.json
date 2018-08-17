@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Some blueprints for unit-tests.",
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "tests",
+    "generators"
   ],
   "repository": "https://github.com/onechiporenko/ember-cli-test-generators",
   "license": "MIT",
@@ -18,10 +20,12 @@
     "start": "ember serve",
     "test": "ember test",
     "test:all": "ember try:each",
-    "test:blueprints": "node node-tests/nodetest-runner.js"
+    "test:blueprints": "node node-tests/nodetest-runner.js",
+    "test:mut": "./node_modules/.bin/stryker run"
   },
   "dependencies": {
-    "ember-cli-babel": "^6.6.0"
+    "ember-cli-babel": "^6.6.0",
+    "silent-error": "^1.0.1"
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.7.0",
@@ -50,6 +54,7 @@
     "ember-try": "^0.2.23",
     "eslint-plugin-ember": "^5.0.0",
     "eslint-plugin-node": "^6.0.1",
+    "glob": "^7.1.2",
     "loader.js": "^4.2.3",
     "mocha": "^4.1.0",
     "qunit-dom": "^0.6.2",

@@ -14,3 +14,8 @@
 
 # ember-try
 /.node_modules.ember-try/
+
+/node-tests/fixtures/
+/reports/
+/stryker.conf.js
+/node-tests/nodetest-runner.js

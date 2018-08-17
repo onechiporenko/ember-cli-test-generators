@@ -1,7 +1,7 @@
 module.exports = function (config) {
   config.set({
     testRunner: 'mocha',
-    reporter: ['clear-text', 'html'],
+    reporter: ['clear-text', 'html', 'dashboard'],
     packageManager: 'npm',
     testFramework: 'mocha',
     coverageAnalysis: 'all',

@@ -25,7 +25,10 @@ module.exports = {
         'testem.js',
         'blueprints/*/index.js',
         'config/**/*.js',
-        'tests/dummy/config/**/*.js'
+        'tests/dummy/config/**/*.js',
+        'node-tests/*.js',
+        'node-tests/blueprints/**/*-test.js',
+        'node-tests/helpers/**/*.js'
       ],
       excludedFiles: [
         'addon/**',
@@ -39,7 +42,8 @@ module.exports = {
       },
       env: {
         browser: false,
-        node: true
+        node: true,
+        mocha: true
       },
       plugins: ['node'],
       rules: Object.assign({}, require('eslint-plugin-node').configs.recommended.rules, {

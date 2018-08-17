@@ -17,18 +17,11 @@ cache:
 
 env:
   global:
-    # See https://git.io/vdao3 for details.
+
     - JOBS=1
+    - secure: TC+ChxRmNRWkN1+FHPIC5Atn2xAI94xc7Wx3ccRGbCZ8pjwK9Nx4kKfFgJchwIf3IgB3qQW/GQRznFaGWloruZyzdBn99H3f8mTMLQvX6o9E3cQOPdOsH6SzFGrmeDCaLlBbwNt7SI12VDzQnkTrxPEN4eL4HGGMPEd54sF9oMr+CSkiNLWrg0bGeB2UqtvgESQGwwH7c9K0oHQQFjNTH300hnAH4E/ij9DPhCvbCZ3eWzgau9xeu1IuGLeflElN4cmKeYjcL7GL2BL+U0bxNDsXFOsO7/7RvpKHvKWY8WXmG22tAyk1J98fS37IxooFTNoylDqAK/KZxdCfb8V7s5HDFtNsm1cHBTqvWsK99+UP2qZWE+sILWlMyiRihM501DJ1pw5LM5j+bdVRhIV+Pn8Qp4OFQmjXsKx0sff+4f+q1pvb8uJOscfwLrghSzsfXPDgefp7SyLlIqWnJmNhD8EP+lOeCz5KpZ2mB0ueCUgrGst9dVpQXk4dADVyyAS6cqnwjdCU4k52V8yjNXsuuzaA1fTk2DytJS0hIgGbyCfX8u8BZIFuRk+crZxzrYTYO/tfH+jd547VqMfsmo9EOxq15D+4S59cIAejMiJnvX9YLPG8eh8Q0xgP0r170YYwtqeg44eNJszEwLQEyBMXNTCIV692b4E0IofeZ9zv570=
+
   matrix:
-    # we recommend new addons test the current and previous LTS
-    # as well as latest stable release (bonus points to beta/canary)
-    - EMBER_TRY_SCENARIO=ember-lts-2.12
-    - EMBER_TRY_SCENARIO=ember-lts-2.16
-    - EMBER_TRY_SCENARIO=ember-lts-2.18
-    - EMBER_TRY_SCENARIO=ember-release
-    - EMBER_TRY_SCENARIO=ember-beta
-    - EMBER_TRY_SCENARIO=ember-canary
-    - EMBER_TRY_SCENARIO=ember-default
     - EMBER_TRY_SCENARIO=node-tests
 
 matrix:
