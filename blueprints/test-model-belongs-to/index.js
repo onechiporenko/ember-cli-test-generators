@@ -19,6 +19,9 @@ module.exports = {
 
   locals(options) {
     const chunks = options.entity.name.split(':');
+    if (chunks.length === 1) {
+      return Promise.reject(new SilentError('Use `modelName:attrName` format'));
+    }
     this.model = chunks[0];
     this.attr = chunks.slice(1).join(':');
     this.related = options.related;
@@ -43,7 +46,7 @@ module.exports = {
       msg = msg + ` inverted as #${this.inverse}`;
     }
     return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
-      `${EOL}  test('${msg}', function (assert) {`,
+      `${EOL}  test('${msg}', function(assert) {`,
       `    const Model = this.owner.lookup('service:store').modelFor('${this.model}');`,
       `    // eslint-disable-next-line`,
       `    const relationship = get(Model, 'relationshipsByName').get('${this.attr}');`,
@@ -51,7 +54,7 @@ module.exports = {
       `    assert.equal(relationship.kind, 'belongsTo');`,
       this.inverse ? `    assert.equal(relationship.options.inverse, '${this.inverse}');` : '',
       `  });`
-    ].filter(_ => !!_).join(`${EOL}`), {after: '});'});
+    ].filter(_ => !!_).join(`${EOL}`), {after: 'setupTest(hooks);'});
   }
 
 };

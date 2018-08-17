@@ -19,6 +19,9 @@ module.exports = {
 
   locals(options) {
     const chunks = options.entity.name.split(':');
+    if (chunks.length === 1) {
+      return Promise.reject(new SilentError('Use `modelName:attrName` format'));
+    }
     this.model = chunks[0];
     this.attr = chunks.slice(1).join(':');
     this.min = options.min;
@@ -29,7 +32,7 @@ module.exports = {
 
   beforeInstall() {
     if (!('ember-cp-validations' in this.project.dependencies())) {
-      return Promise.reject(new SilentError('please, install `ember-cp-validations` before using this generator'));
+      return Promise.reject(new SilentError('Please, install `ember-cp-validations` before using this generator'));
     }
     if (typeof this.max === 'undefined' && typeof this.min === 'undefined' && typeof this.is === 'undefined') {
       return Promise.reject(new SilentError('--is, --max or --min is required'));
@@ -53,7 +56,7 @@ module.exports = {
     if (typeof this.max !== 'undefined') {
       const msg = `#${this.attr} max length is ${this.max}`;
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
-        `${EOL}  test('${msg}', function (assert) {`,
+        `${EOL}  test('${msg}', function(assert) {`,
         `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
         `    run(() => set(model, '${this.attr}', new Array(${this.max + 2}).join('*')));`,
         `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
@@ -64,7 +67,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', new Array(${this.max - 1}).join('*')));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
         `  });`
-      ].join(`${EOL}`), {after: '});'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
     }
     return Promise.resolve();
   },
@@ -73,7 +76,7 @@ module.exports = {
     if (typeof this.min !== 'undefined') {
       const msg = `#${this.attr} min length is ${this.min}`;
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
-        `${EOL}  test('${msg}', function (assert) {`,
+        `${EOL}  test('${msg}', function(assert) {`,
         `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
         `    run(() => set(model, '${this.attr}', new Array(${this.min + 2}).join('*')));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
@@ -84,27 +87,27 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', new Array(${this.min - 1}).join('*')));`,
         `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
         `  });`
-      ].join(`${EOL}`), {after: '});'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
     }
     return Promise.resolve();
   },
 
   insertIsTest() {
-    if (typeof this.min !== 'undefined') {
-      const msg = `#${this.attr} length is ${this.min}`;
+    if (typeof this.is !== 'undefined') {
+      const msg = `#${this.attr} length is ${this.is}`;
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
-        `${EOL}  test('${msg}', function (assert) {`,
+        `${EOL}  test('${msg}', function(assert) {`,
         `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
-        `    run(() => set(model, '${this.attr}', new Array(${this.min + 2}).join('*')));`,
+        `    run(() => set(model, '${this.attr}', new Array(${this.is + 2}).join('*')));`,
         `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
         ``,
-        `    run(() => set(model, '${this.attr}', new Array(${this.min}).join('*')));`,
+        `    run(() => set(model, '${this.attr}', new Array(${this.is}).join('*')));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
         ``,
-        `    run(() => set(model, '${this.attr}', new Array(${this.min - 1}).join('*')));`,
+        `    run(() => set(model, '${this.attr}', new Array(${this.is - 1}).join('*')));`,
         `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
         `  });`
-      ].join(`${EOL}`), {after: '});'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
     }
     return Promise.resolve();
   }

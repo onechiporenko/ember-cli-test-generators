@@ -15,6 +15,9 @@ module.exports = {
 
   locals(options) {
     const chunks = options.entity.name.split(':');
+    if (chunks.length === 1) {
+      return Promise.reject(new SilentError('Use `modelName:attrName` format'));
+    }
     this.model = chunks[0];
     this.attr = chunks.slice(1).join(':');
     this.on = options.on;
@@ -23,7 +26,7 @@ module.exports = {
 
   beforeInstall() {
     if (!('ember-cp-validations' in this.project.dependencies())) {
-      return Promise.reject(new SilentError('please, install `ember-cp-validations` before using this generator'));
+      return Promise.reject(new SilentError('Please, install `ember-cp-validations` before using this generator'));
     }
     if (typeof this.on === 'undefined') {
       return Promise.reject(new SilentError('--on is required'));
@@ -36,7 +39,7 @@ module.exports = {
 
   insertTest() {
     return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
-      `${EOL}  test('#${this.attr} must match #${this.on} value', function (assert) {`,
+      `${EOL}  test('#${this.attr} must match #${this.on} value', function(assert) {`,
       `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
       `    const firstValue = 'Jim';`,
       `    const secondValue = 'Sarah';`,
@@ -49,7 +52,7 @@ module.exports = {
       `    run(() => set(model, '${this.attr}', secondValue));`,
       `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
       `  });`
-    ].join(`${EOL}`), {after: '});'});
+    ].join(`${EOL}`), {after: 'setupTest(hooks);'});
   },
 
 };
