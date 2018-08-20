@@ -34,25 +34,36 @@ module.exports = {
   },
 
   afterInstall() {
-    return this.insertTest();
+    return this.insertTest()
+      .then(() => this.insertImport());
   },
 
   insertTest() {
     return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
       `${EOL}  test('#${this.attr} must match #${this.on} value', function(assert) {`,
-      `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+      `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
       `    const firstValue = 'Jim';`,
       `    const secondValue = 'Sarah';`,
       `    run(() => {`,
       `      set(model, '${this.attr}', firstValue);`,
       `      set(model, '${this.on}', secondValue);`,
       `    });`,
-      `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+      `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'confirmation'));`,
       ``,
       `    run(() => set(model, '${this.attr}', secondValue));`,
-      `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+      `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'confirmation'));`,
       `  });`
     ].join(`${EOL}`), {after: 'setupTest(hooks);'});
   },
+
+  insertImport() {
+    return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`,
+      [
+        `import { get, set } from '@ember/object';`,
+        `import { run } from '@ember/runloop';`,
+      ].join(EOL),
+      {before: 'import { setupTest } from \'ember-qunit\';'}
+    );
+  }
 
 };

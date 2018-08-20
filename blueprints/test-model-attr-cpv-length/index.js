@@ -57,17 +57,18 @@ module.exports = {
       const msg = `#${this.attr} max length is ${this.max}`;
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
         `${EOL}  test('${msg}', function(assert) {`,
-        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
         `    run(() => set(model, '${this.attr}', new Array(${this.max + 2}).join('*')));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         ``,
         `    run(() => set(model, '${this.attr}', new Array(${this.max}).join('*')));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         ``,
         `    run(() => set(model, '${this.attr}', new Array(${this.max - 1}).join('*')));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+        .then(() => this.insertImport());
     }
     return Promise.resolve();
   },
@@ -77,17 +78,18 @@ module.exports = {
       const msg = `#${this.attr} min length is ${this.min}`;
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
         `${EOL}  test('${msg}', function(assert) {`,
-        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
         `    run(() => set(model, '${this.attr}', new Array(${this.min + 2}).join('*')));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         ``,
         `    run(() => set(model, '${this.attr}', new Array(${this.min}).join('*')));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         ``,
         `    run(() => set(model, '${this.attr}', new Array(${this.min - 1}).join('*')));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+        .then(() => this.insertImport());
     }
     return Promise.resolve();
   },
@@ -97,19 +99,30 @@ module.exports = {
       const msg = `#${this.attr} length is ${this.is}`;
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
         `${EOL}  test('${msg}', function(assert) {`,
-        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
         `    run(() => set(model, '${this.attr}', new Array(${this.is + 2}).join('*')));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         ``,
         `    run(() => set(model, '${this.attr}', new Array(${this.is}).join('*')));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         ``,
         `    run(() => set(model, '${this.attr}', new Array(${this.is - 1}).join('*')));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+        .then(() => this.insertImport());
     }
     return Promise.resolve();
+  },
+
+  insertImport() {
+    return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`,
+      [
+        `import { get, set } from '@ember/object';`,
+        `import { run } from '@ember/runloop';`,
+      ].join(EOL),
+      {before: 'import { setupTest } from \'ember-qunit\';'}
+    );
   }
 
 };

@@ -1,27 +1,29 @@
 import { module, test } from 'qunit';
+import { get, set } from '@ember/object';
+import { run } from '@ember/runloop';
 import { setupTest } from 'ember-qunit';
 
 module('Unit | Model | user', function(hooks) {
   setupTest(hooks);
   test('#age must be an integer', function(assert) {
-    const model = run(() => this.owner.lookup('service:store').createRecord('user'));
+    const model = this.owner.lookup('service:store').createRecord('user');
     run(() => set(model, 'age', -9));
-    assert.ok(get(model, 'validations.attrs.age.isValid'));
+    assert.notOk(get(model, 'validations.attrs.age.errors').isAny('type', 'number'));
 
     run(() => set(model, 'age', -9.1));
-    assert.notOk(get(model, 'validations.attrs.age.isValid'));
+    assert.ok(get(model, 'validations.attrs.age.errors').isAny('type', 'number'));
   });
 
   test('#age min value is -10', function(assert) {
-    const model = run(() => this.owner.lookup('service:store').createRecord('user'));
+    const model = this.owner.lookup('service:store').createRecord('user');
     run(() => set(model, 'age', -9));
-    assert.ok(get(model, 'validations.attrs.age.isValid'));
+    assert.notOk(get(model, 'validations.attrs.age.errors').isAny('type', 'number'));
 
     run(() => set(model, 'age', -10));
-    assert.ok(get(model, 'validations.attrs.age.isValid'));
+    assert.notOk(get(model, 'validations.attrs.age.errors').isAny('type', 'number'));
 
     run(() => set(model, 'age', -11));
-    assert.notOk(get(model, 'validations.attrs.age.isValid'));
+    assert.ok(get(model, 'validations.attrs.age.errors').isAny('type', 'number'));
   });
 
 

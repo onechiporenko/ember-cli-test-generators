@@ -1,15 +1,17 @@
 import { module, test } from 'qunit';
+import { get, set } from '@ember/object';
+import { run } from '@ember/runloop';
 import { setupTest } from 'ember-qunit';
 
 module('Unit | Model | user', function(hooks) {
   setupTest(hooks);
   test('#age can be null and undefined', function(assert) {
-    const model = run(() => this.owner.lookup('service:store').createRecord('user'));
+    const model = this.owner.lookup('service:store').createRecord('user');
     run(() => set(model, 'age', null));
-    assert.ok(get(model, 'validations.attrs.age.isValid'));
+    assert.notOk(get(model, 'validations.attrs.age.errors').isAny('type', 'number'));
 
     run(() => set(model, 'age', undefined));
-    assert.ok(get(model, 'validations.attrs.age.isValid'));
+    assert.notOk(get(model, 'validations.attrs.age.errors').isAny('type', 'number'));
   });
 
 

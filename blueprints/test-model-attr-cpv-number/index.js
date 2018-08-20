@@ -72,17 +72,18 @@ module.exports = {
       const msg = `#${this.attr} max value is ${this.max}`;
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
         `${EOL}  test('${msg}', function(assert) {`,
-        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
         `    run(() => set(model, '${this.attr}', ${this.max + 1}));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         ``,
         `    run(() => set(model, '${this.attr}', ${this.max}));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         ``,
         `    run(() => set(model, '${this.attr}', ${this.max - 1}));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+        .then(() => this.insertImport());
     }
     return Promise.resolve();
   },
@@ -92,17 +93,18 @@ module.exports = {
       const msg = `#${this.attr} min value is ${this.min}`;
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
         `${EOL}  test('${msg}', function(assert) {`,
-        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
         `    run(() => set(model, '${this.attr}', ${this.min + 1}));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         ``,
         `    run(() => set(model, '${this.attr}', ${this.min}));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         ``,
         `    run(() => set(model, '${this.attr}', ${this.min - 1}));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+        .then(() => this.insertImport());
     }
     return Promise.resolve();
   },
@@ -121,14 +123,15 @@ module.exports = {
       }
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
         `${EOL}  test('#${this.attr} must be an integer', function(assert) {`,
-        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
         `    run(() => set(model, '${this.attr}', ${testValInt}));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         ``,
         `    run(() => set(model, '${this.attr}', ${testValFloat}));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+        .then(() => this.insertImport());
     }
     return Promise.resolve();
   },
@@ -138,17 +141,18 @@ module.exports = {
       const msg = `#${this.attr} must be greater than 0`;
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
         `${EOL}  test('${msg}', function(assert) {`,
-        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
         `    run(() => set(model, '${this.attr}', 1));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         ``,
         `    run(() => set(model, '${this.attr}', 0));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         ``,
         `    run(() => set(model, '${this.attr}', -1));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+        .then(() => this.insertImport());
     }
     return Promise.resolve();
   },
@@ -167,14 +171,15 @@ module.exports = {
       }
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
         `${EOL}  test('#${this.attr} must be odd', function(assert) {`,
-        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
         `    run(() => set(model, '${this.attr}', ${valid}));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         ``,
         `    run(() => set(model, '${this.attr}', ${invalid}));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+        .then(() => this.insertImport());
     }
     return Promise.resolve();
   },
@@ -193,14 +198,15 @@ module.exports = {
       }
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
         `${EOL}  test('#${this.attr} must be even', function(assert) {`,
-        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
         `    run(() => set(model, '${this.attr}', ${valid}));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         ``,
         `    run(() => set(model, '${this.attr}', ${invalid}));`,
-        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+        .then(() => this.insertImport());
     }
     return Promise.resolve();
   },
@@ -209,16 +215,27 @@ module.exports = {
     if (this.allowNone) {
       return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
         `${EOL}  test('#${this.attr} can be null and undefined', function(assert) {`,
-        `    const model = run(() => this.owner.lookup('service:store').createRecord('${this.model}'));`,
+        `    const model = this.owner.lookup('service:store').createRecord('${this.model}');`,
         `    run(() => set(model, '${this.attr}', null));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         ``,
         `    run(() => set(model, '${this.attr}', undefined));`,
-        `    assert.ok(get(model, 'validations.attrs.${this.attr}.isValid'));`,
+        `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+        .then(() => this.insertImport());
     }
     return Promise.resolve();
   },
+
+  insertImport() {
+    return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`,
+      [
+        `import { get, set } from '@ember/object';`,
+        `import { run } from '@ember/runloop';`,
+      ].join(EOL),
+      {before: 'import { setupTest } from \'ember-qunit\';'}
+    );
+  }
 
 };

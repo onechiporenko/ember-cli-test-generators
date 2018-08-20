@@ -1,20 +1,22 @@
 import { module, test } from 'qunit';
+import { get, set } from '@ember/object';
+import { run } from '@ember/runloop';
 import { setupTest } from 'ember-qunit';
 
 module('Unit | Model | user', function(hooks) {
   setupTest(hooks);
   test('#password must match #passwordConfirmation value', function(assert) {
-    const model = run(() => this.owner.lookup('service:store').createRecord('user'));
+    const model = this.owner.lookup('service:store').createRecord('user');
     const firstValue = 'Jim';
     const secondValue = 'Sarah';
     run(() => {
       set(model, 'password', firstValue);
       set(model, 'passwordConfirmation', secondValue);
     });
-    assert.notOk(get(model, 'validations.attrs.password.isValid'));
+    assert.ok(get(model, 'validations.attrs.password.errors').isAny('type', 'confirmation'));
 
     run(() => set(model, 'password', secondValue));
-    assert.ok(get(model, 'validations.attrs.password.isValid'));
+    assert.notOk(get(model, 'validations.attrs.password.errors').isAny('type', 'confirmation'));
   });
 
 

@@ -1,18 +1,20 @@
 import { module, test } from 'qunit';
+import { get, set } from '@ember/object';
+import { run } from '@ember/runloop';
 import { setupTest } from 'ember-qunit';
 
 module('Unit | Model | user', function(hooks) {
   setupTest(hooks);
   test('#password length is 15', function(assert) {
-    const model = run(() => this.owner.lookup('service:store').createRecord('user'));
+    const model = this.owner.lookup('service:store').createRecord('user');
     run(() => set(model, 'password', new Array(17).join('*')));
-    assert.notOk(get(model, 'validations.attrs.password.isValid'));
+    assert.ok(get(model, 'validations.attrs.password.errors').isAny('type', 'length'));
 
     run(() => set(model, 'password', new Array(15).join('*')));
-    assert.ok(get(model, 'validations.attrs.password.isValid'));
+    assert.notOk(get(model, 'validations.attrs.password.errors').isAny('type', 'length'));
 
     run(() => set(model, 'password', new Array(14).join('*')));
-    assert.notOk(get(model, 'validations.attrs.password.isValid'));
+    assert.ok(get(model, 'validations.attrs.password.errors').isAny('type', 'length'));
   });
 
 
