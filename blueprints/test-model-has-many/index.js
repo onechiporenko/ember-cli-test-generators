@@ -17,7 +17,7 @@ module.exports = {
   related: undefined,
   inverse: undefined,
 
-  locals(options) {
+  beforeInstall(options) {
     const chunks = options.entity.name.split(':');
     if (chunks.length === 1) {
       return Promise.reject(new SilentError('Use `modelName:attrName` format'));
@@ -26,10 +26,6 @@ module.exports = {
     this.attr = chunks.slice(1).join(':');
     this.related = options.related;
     this.inverse = options.inverse;
-    return {};
-  },
-
-  beforeInstall() {
     if (!this.related) {
       return Promise.reject(new SilentError('--related is required'));
     }
@@ -54,7 +50,7 @@ module.exports = {
       `    assert.equal(relationship.kind, 'hasMany');`,
       this.inverse ? `    assert.equal(relationship.options.inverse, '${this.inverse}');` : '',
       `  });`
-    ].filter(_ => !!_).join(`${EOL}`), {after: 'setupTest(hooks);'});
+    ].filter(_ => !!_).join(EOL), {after: 'setupTest(hooks);'});
   }
 
 };

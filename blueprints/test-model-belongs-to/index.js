@@ -2,6 +2,7 @@
 
 const EOL = require('os').EOL;
 const SilentError = require('silent-error');
+const fs = require('fs');
 
 module.exports = {
   description: 'Generates a test for model\'s belongs-to relationship',
@@ -17,7 +18,7 @@ module.exports = {
   related: undefined,
   inverse: undefined,
 
-  locals(options) {
+  beforeInstall(options) {
     const chunks = options.entity.name.split(':');
     if (chunks.length === 1) {
       return Promise.reject(new SilentError('Use `modelName:attrName` format'));
@@ -25,14 +26,10 @@ module.exports = {
     this.model = chunks[0];
     this.attr = chunks.slice(1).join(':');
     this.related = options.related;
-    this.inverse = options.inverse;
-    return {};
-  },
-
-  beforeInstall() {
-    if (!this.related) {
+    if (!options.related) {
       return Promise.reject(new SilentError('--related is required'));
     }
+    this.inverse = options.inverse;
     return this.lookupBlueprint('model');
   },
 
@@ -41,11 +38,15 @@ module.exports = {
   },
 
   insertTest() {
+    const filePath = `tests/unit/models/${this.model}-test.js`;
+    if (!fs.existsSync(filePath)) {
+      return Promise.reject(new SilentError(`File "${filePath}" was not found`));
+    }
     let msg = `#${this.attr} belongs to "${this.related}"`;
     if (this.inverse) {
       msg = msg + ` inverted as #${this.inverse}`;
     }
-    return this.insertIntoFile(`tests/unit/models/${this.model}-test.js`, [
+    return this.insertIntoFile(filePath, [
       `${EOL}  test('${msg}', function(assert) {`,
       `    const Model = this.owner.lookup('service:store').modelFor('${this.model}');`,
       `    // eslint-disable-next-line`,
@@ -54,7 +55,7 @@ module.exports = {
       `    assert.equal(relationship.kind, 'belongsTo');`,
       this.inverse ? `    assert.equal(relationship.options.inverse, '${this.inverse}');` : '',
       `  });`
-    ].filter(_ => !!_).join(`${EOL}`), {after: 'setupTest(hooks);'});
+    ].filter(_ => !!_).join(EOL), {after: 'setupTest(hooks);'});
   }
 
 };

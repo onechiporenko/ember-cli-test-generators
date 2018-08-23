@@ -13,7 +13,7 @@ module.exports = {
     {name: 'on', type: String},
   ],
 
-  locals(options) {
+  beforeInstall(options) {
     const chunks = options.entity.name.split(':');
     if (chunks.length === 1) {
       return Promise.reject(new SilentError('Use `modelName:attrName` format'));
@@ -21,10 +21,6 @@ module.exports = {
     this.model = chunks[0];
     this.attr = chunks.slice(1).join(':');
     this.on = options.on;
-    return {};
-  },
-
-  beforeInstall() {
     if (!('ember-cp-validations' in this.project.dependencies())) {
       return Promise.reject(new SilentError('Please, install `ember-cp-validations` before using this generator'));
     }
@@ -53,7 +49,7 @@ module.exports = {
       `    run(() => set(model, '${this.attr}', secondValue));`,
       `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'confirmation'));`,
       `  });`
-    ].join(`${EOL}`), {after: 'setupTest(hooks);'});
+    ].join(EOL), {after: 'setupTest(hooks);'});
   },
 
   insertImport() {

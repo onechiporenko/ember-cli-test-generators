@@ -1,11 +1,13 @@
 'use strict';
 
 const blueprintHelpers = require('ember-cli-blueprint-test-helpers/helpers');
-const setupTestHooks = blueprintHelpers.setupTestHooks;
-const emberNew = blueprintHelpers.emberNew;
-const emberGenerate = blueprintHelpers.emberGenerate;
-const emberDestroy = blueprintHelpers.emberDestroy;
-const modifyPackages = blueprintHelpers.modifyPackages;
+const {
+  setupTestHooks,
+  emberNew,
+  emberGenerate,
+  emberDestroy,
+  modifyPackages
+} = blueprintHelpers;
 
 const fixture = require('../helpers/fixture');
 const chai = require('ember-cli-blueprint-test-helpers/chai');

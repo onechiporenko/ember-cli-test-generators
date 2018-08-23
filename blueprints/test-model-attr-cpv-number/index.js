@@ -24,7 +24,7 @@ module.exports = {
     {name: 'allow-none', type: Boolean, default: false, aliases: ['an']},
   ],
 
-  locals(options) {
+  beforeInstall(options) {
     const chunks = options.entity.name.split(':');
     if (chunks.length === 1) {
       return Promise.reject(new SilentError('Use `modelName:attrName` format'));
@@ -38,10 +38,6 @@ module.exports = {
     this.odd = options.odd;
     this.even = options.even;
     this.allowNone = options.allowNone;
-    return {};
-  },
-
-  beforeInstall() {
     if (!('ember-cp-validations' in this.project.dependencies())) {
       return Promise.reject(new SilentError('Please, install `ember-cp-validations` before using this generator'));
     }
@@ -82,7 +78,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', ${this.max - 1}));`,
         `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+      ].join(EOL), {after: 'setupTest(hooks);'})
         .then(() => this.insertImport());
     }
     return Promise.resolve();
@@ -103,7 +99,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', ${this.min - 1}));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+      ].join(EOL), {after: 'setupTest(hooks);'})
         .then(() => this.insertImport());
     }
     return Promise.resolve();
@@ -130,7 +126,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', ${testValFloat}));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+      ].join(EOL), {after: 'setupTest(hooks);'})
         .then(() => this.insertImport());
     }
     return Promise.resolve();
@@ -151,7 +147,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', -1));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+      ].join(EOL), {after: 'setupTest(hooks);'})
         .then(() => this.insertImport());
     }
     return Promise.resolve();
@@ -178,7 +174,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', ${invalid}));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+      ].join(EOL), {after: 'setupTest(hooks);'})
         .then(() => this.insertImport());
     }
     return Promise.resolve();
@@ -205,7 +201,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', ${invalid}));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+      ].join(EOL), {after: 'setupTest(hooks);'})
         .then(() => this.insertImport());
     }
     return Promise.resolve();
@@ -222,7 +218,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', undefined));`,
         `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'number'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+      ].join(EOL), {after: 'setupTest(hooks);'})
         .then(() => this.insertImport());
     }
     return Promise.resolve();

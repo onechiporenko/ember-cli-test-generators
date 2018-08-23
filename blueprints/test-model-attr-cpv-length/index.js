@@ -17,7 +17,7 @@ module.exports = {
     {name: 'is', type: Number}
   ],
 
-  locals(options) {
+  beforeInstall(options) {
     const chunks = options.entity.name.split(':');
     if (chunks.length === 1) {
       return Promise.reject(new SilentError('Use `modelName:attrName` format'));
@@ -27,10 +27,6 @@ module.exports = {
     this.min = options.min;
     this.max = options.max;
     this.is = options.is;
-    return {};
-  },
-
-  beforeInstall() {
     if (!('ember-cp-validations' in this.project.dependencies())) {
       return Promise.reject(new SilentError('Please, install `ember-cp-validations` before using this generator'));
     }
@@ -67,7 +63,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', new Array(${this.max - 1}).join('*')));`,
         `    assert.notOk(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+      ].join(EOL), {after: 'setupTest(hooks);'})
         .then(() => this.insertImport());
     }
     return Promise.resolve();
@@ -88,7 +84,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', new Array(${this.min - 1}).join('*')));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+      ].join(EOL), {after: 'setupTest(hooks);'})
         .then(() => this.insertImport());
     }
     return Promise.resolve();
@@ -109,7 +105,7 @@ module.exports = {
         `    run(() => set(model, '${this.attr}', new Array(${this.is - 1}).join('*')));`,
         `    assert.ok(get(model, 'validations.attrs.${this.attr}.errors').isAny('type', 'length'));`,
         `  });`
-      ].join(`${EOL}`), {after: 'setupTest(hooks);'})
+      ].join(EOL), {after: 'setupTest(hooks);'})
         .then(() => this.insertImport());
     }
     return Promise.resolve();
